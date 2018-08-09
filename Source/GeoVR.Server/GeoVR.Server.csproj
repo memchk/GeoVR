@@ -43,6 +43,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Device" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -52,10 +53,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\ClientHeartbeatServer.cs" />
+    <Compile Include="Classes\ClientHeartbeatReception.cs" />
     <Compile Include="Classes\ClientSubscriptionData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server.cs" />
+    <Compile Include="ServerStatistics.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

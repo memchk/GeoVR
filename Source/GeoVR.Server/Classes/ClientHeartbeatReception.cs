@@ -7,11 +7,11 @@ using GeoVR.Shared;
 
 namespace GeoVR.Server
 {
-    public class ClientHeartbeatOnServer : ClientHeartbeat
+    public class ClientHeartbeatReception : ClientHeartbeat
     {
         public DateTime ReceivedUTC { get; set; }
 
-        public ClientHeartbeatOnServer(ClientHeartbeat clientHeartbeat)
+        public ClientHeartbeatReception(ClientHeartbeat clientHeartbeat)
         {
             ClientID = clientHeartbeat.ClientID;
             ReceivedUTC = DateTime.UtcNow;

@@ -25,5 +25,17 @@ namespace GeoVR.Shared
                 return ms.Length;
             }
         }
+
+        public static long Serialise<T>(this PublisherSocket publisherSocket, string topic, T data)
+        {
+            MemoryStream ms = new MemoryStream();
+            using (BsonWriter writer = new BsonWriter(ms))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(writer, data);
+                publisherSocket.SendMoreFrame(topic).SendFrame(ms.ToArray());
+                return ms.Length;
+            }
+        }
     }
 }

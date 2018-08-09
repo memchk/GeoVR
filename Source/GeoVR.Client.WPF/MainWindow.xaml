@@ -16,7 +16,6 @@
         <Label x:Name="lblcaption2" Content="Press Any Key to Transmit when Window Selected" Grid.Column="1" HorizontalAlignment="Left" Margin="37,221,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="296"/>
         <Label x:Name="lbStatus" Content="Idle." Grid.Column="1" HorizontalAlignment="Left" Margin="10,278,0,0" VerticalAlignment="Top" Width="250"/>
         <Label x:Name="lbStats" Content="Stats: None" Grid.Column="1" HorizontalAlignment="Left" Margin="10,309,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="294"/>
-        <Label x:Name="lbUser" Content="Last user: None" Grid.Column="1" HorizontalAlignment="Left" Margin="10,335,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="323"/>
         <Image Grid.Column="1" HorizontalAlignment="Left" Height="99" Margin="55,10,0,0" VerticalAlignment="Top" Width="264" Grid.ColumnSpan="2"/>
         <Image Grid.ColumnSpan="2" Margin="23,0,40,311" Source="vatsim.jpg" Stretch="Fill" Grid.Column="1"/>
         <Label x:Name="lblcaption_Copy" Content="OPUS Codec on Client, AWS Server Side, Single Test Room For Now" Grid.Column="1" HorizontalAlignment="Left" Margin="23,139,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="320"/>

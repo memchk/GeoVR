@@ -29,7 +29,7 @@ namespace GeoVR.Client.WPF
         public MainWindow()
         {
             InitializeComponent();
-            client.Start(address, Environment.MachineName + " - " + Environment.UserName);
+            client.Start(address, Environment.MachineName + " - " + Environment.UserName, Shared.ClientType.Mobile);
             if (timer == null)
             {
                 timer = new System.Timers.Timer();
@@ -56,8 +56,7 @@ namespace GeoVR.Client.WPF
             var timeDiff = DateTime.Now - _startTime;
             //var bpsSend = client.BytesSent / timeDiff.TotalSeconds;
             //var bpsReceive = client.B    ytesReceived / timeDiff.TotalSeconds;
-            Dispatcher.Invoke(() => { lbStats.Content = string.Format("Sent: {0:N0} B, Received: {1:N0} B", client.BytesSent, client.BytesReceived); });
-            Dispatcher.Invoke(() => { lbUser.Content = string.Format("Last user: {0}", client.LastUser); });
+            Dispatcher.Invoke(() => { lbStats.Content = string.Format("Sent: {0:N0} B, Received: {1:N0} B", client.ClientStatistics.AudioBytesSent, client.ClientStatistics.AudioBytesReceived); });
             Dispatcher.Invoke(() => { lbUsers.ItemsSource = client.LastReceivedOneSecondInfo.ClientIDs; });
         }
 

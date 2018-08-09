@@ -12,38 +12,57 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Device.Location;
+using System.Timers;
 
 namespace GeoVR.Client.WinForms
 {
     public partial class Form1 : Form
     {
-
-        double latitude;
-        double longitude;
-     
-
+        Client client = new Client();
+        string address = "antifaffvoice.vatsim.uk";
+        System.Windows.Forms.Timer timer = null;
+        double latitude = 51;
+        double longitude = 0;
 
         public Form1()
         {
             InitializeComponent();
+            this.KeyPreview = true;
+            client.Start(address, Environment.MachineName + " - " + Environment.UserName, Shared.ClientType.Mobile);
+            if (timer == null)
+            {
+                timer = new System.Windows.Forms.Timer();
+                timer.Interval = 100;
+                timer.Tick += Timer_Tick;
+            }
+            timer.Start();
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            //var timeDiff = DateTime.Now - _startTime;
+            //var bpsSend = client.BytesSent / timeDiff.TotalSeconds;
+            //var bpsReceive = client.B    ytesReceived / timeDiff.TotalSeconds;
+            //Dispatcher.Invoke(() => { lbStats.Content = string.Format("Sent: {0:N0} B, Received: {1:N0} B", client.ClientStatistics.AudioBytesSent, client.ClientStatistics.AudioBytesReceived); });
+            //Dispatcher.Invoke(() => { lbUsers.ItemsSource = client.LastReceivedOneSecondInfo.ClientIDs; });
+            RefreshMapMarkers();
+            client.SetPosition(latitude, longitude, 0);
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
 
             InitMap();
-            AddMarker(51, 0, "EGLL_APP");
-            AddRadioRing(51, 0, 50.0f);
-          
 
+            RefreshMapMarkers();
         }
 
 
-        private void AddRadioRing(double lat,double lon, double range)
+        private void AddRadioRing(double lat, double lon, double range)
         {
-
+            range = range * 2;
             GMapOverlay polygons = new GMapOverlay("polygons");
-         
+
             List<PointLatLng> gpollist = new List<PointLatLng>();
 
             double seg = Math.PI * 2 / 30;
@@ -52,8 +71,8 @@ namespace GeoVR.Client.WinForms
             for (int i = 0; i < 30; i++)
             {
                 double theta = seg * i;
-                double a = lat + Math.Cos(theta) * range/100*0.75f;
-                double b = lon + Math.Sin(theta) * range/100;
+                double a = lat + Math.Cos(theta) * range / 100 * 0.75f;
+                double b = lon + Math.Sin(theta) * range / 100;
 
                 PointLatLng gpoi = new PointLatLng(a, b);
 
@@ -63,13 +82,11 @@ namespace GeoVR.Client.WinForms
             GMapPolygon polygon = new GMapPolygon(gpollist, "Jardin des Tuileries");
             gMapControl1.Overlays.Add(polygons);
             polygons.Polygons.Add(polygon);
-          
+
         }
 
-        private void AddMarker(double lat,double lon,string name)
+        private void AddMarker(double lat, double lon, string name)
         {
-         
-
             GMapOverlay markers = new GMapOverlay(name);
             GMapMarker marker = new GMarkerGoogle(
                 new PointLatLng(lat, lon),
@@ -78,22 +95,7 @@ namespace GeoVR.Client.WinForms
             marker.ToolTipText = name;
             gMapControl1.Overlays.Add(markers);
             markers.Markers.Add(marker);
-            
-
-
-            
-
-
         }
-
-
-        
-
-        
-
-        
-
-
 
         public static double DistanceTwoPoint(double startLat, double startLong, double endLat, double endLong)
         {
@@ -103,7 +105,6 @@ namespace GeoVR.Client.WinForms
 
             return startPoint.GetDistanceTo(endPoint);
         }
-
 
         private void InitMap()
         {
@@ -119,37 +120,60 @@ namespace GeoVR.Client.WinForms
             gMapControl1.MaxZoom = 20;
             //set zoom
             gMapControl1.Zoom = 5;
-
-          
-            
-
-        }
-
-        private void txTrackBar_Scroll(object sender, EventArgs e)
-        {
-            txDistLabel.Text = txTrackBar.Value.ToString();
-        }
-
-        private void rxTrackBar_Scroll(object sender, EventArgs e)
-        {
-            rxDistLabel.Text = rxTrackBar.Value.ToString();
         }
 
         private void gMapControl1_OnPositionChanged(PointLatLng point)
         {
             latitude = point.Lat;
             longitude = point.Lng;
-
-            lonLatLabel.Text = latitude.ToString() + "/" + longitude.ToString();
-            gMapControl1.Overlays.Clear();
-            AddRadioRing(latitude,longitude, txTrackBar.Value);
-            gMapControl1.ReloadMap();
-
+            RefreshMapMarkers();
         }
 
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Space)
+            {
+                PTT(true);
+            }
+        }
 
+        private void Form1_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Space)
+            {
+                PTT(false);
+            }
+        }
 
+        private void Form1_Deactivate(object sender, EventArgs e)
+        {
+            PTT(false);
+        }
 
+        private void PTT(bool active)
+        {
+            client.PTT(active);
+            if (active)
+                lblPTT.Text = "Radio: Transmitting";
+            else
+                lblPTT.Text = "Radio: Idle";
+        }
+
+        private void RefreshMapMarkers()
+        {
+            lonLatLabel.Text = latitude.ToString() + "/" + longitude.ToString();
+
+            gMapControl1.Overlays.Clear();
+
+            var positions = client.LastReceivedOneSecondInfo.ClientPositions;
+            var radioRadii = client.LastReceivedOneSecondInfo.ClientRadioRadii;
+            for (int i = 0; i < positions.Count; i++)
+            {
+                if (positions[i].ClientID != Environment.MachineName + " - " + Environment.UserName)
+                    AddMarker(positions[i].LatDeg, positions[i].LonDeg, positions[i].ClientID);
+                AddRadioRing(positions[i].LatDeg, positions[i].LonDeg, radioRadii[i].ReceiveRadiusM / 1609.34);
+            }
+            gMapControl1.ReloadMap();
+        }
     }
-
 }
