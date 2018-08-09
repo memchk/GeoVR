@@ -17,10 +17,13 @@ namespace GeoVR.Client
     public class Client
     {
         private CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
-        private Task taskPub;
-        private Task taskSub;
-        private Task taskReceivedAudio;
-        private BlockingCollection<object> transmitQueue = new BlockingCollection<object>();
+        private Task taskDataPub;
+        private Task taskDataSub;
+        private Task taskAudioPub;
+        private Task taskAudioSub;
+        private Task taskAudioPlayback;
+        private BlockingCollection<object> dataPublishInputQueue = new BlockingCollection<object>();
+        private BlockingCollection<byte[]> audioPublishInputQueue = new BlockingCollection<byte[]>();
         private BlockingCollection<byte[]> audioPlaybackQueue = new BlockingCollection<byte[]>();
 
         WaveIn _waveIn;
@@ -49,8 +52,14 @@ namespace GeoVR.Client
 
         public void Start(string ipAddress, string username)
         {
-            taskPub = new Task(() => TaskPub(cancelTokenSource.Token, transmitQueue, "tcp://" + ipAddress + ":60001"), TaskCreationOptions.LongRunning);
-            taskPub.Start();
+            taskDataPub = new Task(() => TaskDataPub(cancelTokenSource.Token, dataPublishInputQueue, "tcp://" + ipAddress + ":60001"), TaskCreationOptions.LongRunning);
+            taskDataPub.Start();
+            taskDataSub = new Task(() => TaskDataSub(cancelTokenSource.Token, audioPlaybackQueue, "tcp://" + ipAddress + ":60000"), TaskCreationOptions.LongRunning);
+            taskDataSub.Start();
+            taskAudioPub = new Task(() => TaskAudioPub(cancelTokenSource.Token, audioPublishInputQueue, "tcp://" + ipAddress + ":60003"), TaskCreationOptions.LongRunning);
+            taskAudioPub.Start();
+            taskAudioSub = new Task(() => TaskAudioSub(cancelTokenSource.Token, audioPlaybackQueue, "tcp://" + ipAddress + ":60002"), TaskCreationOptions.LongRunning);
+            taskAudioSub.Start();
 
             LastReceivedOneSecondInfo = new OneSecondInfo();
             _startTime = DateTime.Now;
@@ -72,13 +81,13 @@ namespace GeoVR.Client
             _waveIn.WaveFormat = new WaveFormat(48000, 16, 1);
 
             _playBuffer = new BufferedWaveProvider(new WaveFormat(48000, 16, 1));
-            taskReceivedAudio = new Task(() => TaskReceivedAudio(cancelTokenSource.Token, audioPlaybackQueue), TaskCreationOptions.LongRunning);
-            taskReceivedAudio.Start();
+            taskAudioPlayback = new Task(() => TaskAudioPlayback(cancelTokenSource.Token, audioPlaybackQueue), TaskCreationOptions.LongRunning);
+            taskAudioPlayback.Start();
 
             _waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback());
             Console.WriteLine("Output device: " + WaveOut.GetCapabilities(0).ProductName);
             _waveOut.DeviceNumber = 0;
-            _waveOut.DesiredLatency = 150;      //Default is 300
+            _waveOut.DesiredLatency = 300;      //Default is 300
             _waveOut.Init(_playBuffer);
 
             _waveOut.Play();
@@ -91,9 +100,6 @@ namespace GeoVR.Client
                 _timer.Elapsed += _timer_Elapsed;
             }
             _timer.Start();
-
-            taskSub = new Task(() => TaskSub(cancelTokenSource.Token, audioPlaybackQueue, "tcp://" + ipAddress + ":60000"), TaskCreationOptions.LongRunning);
-            taskSub.Start();
         }
 
         public void Stop()
@@ -124,7 +130,7 @@ namespace GeoVR.Client
             var bpsSend = _bytesSent / timeDiff.TotalSeconds;
             var bpsReceive = _bytesReceived / timeDiff.TotalSeconds;
             Console.WriteLine("Send rate: {0:N1} B/s, Receive rate: {1:N1} B/s", bpsSend, bpsReceive);
-            transmitQueue.Add(new ClientHeartbeat() { Username = _username });
+            dataPublishInputQueue.Add(new ClientHeartbeat() { ClientID = _username });
         }
 
         byte[] _notEncodedBuffer = new byte[0];
@@ -160,16 +166,16 @@ namespace GeoVR.Client
                 {
                     byte[] trimmedBuff = new byte[len];
                     Buffer.BlockCopy(buff, 0, trimmedBuff, 0, len);
-                    transmitQueue.Add(new ClientAudioData() { Data = trimmedBuff, ClientName = _username });
+                    audioPublishInputQueue.Add(trimmedBuff);
                 }
             }
         }
 
-        private void TaskPub(CancellationToken cancelToken, BlockingCollection<object> queue, string address)
+        private void TaskDataPub(CancellationToken cancelToken, BlockingCollection<object> queue, string address)
         {
             using (var pubSocket = new PublisherSocket())
             {
-                pubSocket.Options.SendHighWatermark = 1000;
+                //pubSocket.Options.SendHighWatermark = 1;
                 pubSocket.Connect(address);
 
                 while (!cancelToken.IsCancellationRequested)
@@ -178,27 +184,24 @@ namespace GeoVR.Client
                     {
                         switch (data.GetType().Name)
                         {
-                            case "ClientAudioData":
-                                _bytesSent += pubSocket.Serialise<ClientAudioData>(data);
-                                break;
                             case "ClientHeartbeat":
-                                _bytesSent += pubSocket.Serialise<ClientHeartbeat>(data);
+                                pubSocket.Serialise<ClientHeartbeat>(data);
                                 break;
                         }
                     }
                 }
             }
-            taskPub = null;
+            taskDataPub = null;
         }
 
-        private void TaskSub(CancellationToken cancelToken, BlockingCollection<byte[]> playbackQueue, string address)
+        private void TaskDataSub(CancellationToken cancelToken, BlockingCollection<byte[]> playbackQueue, string address)
         {
-            var lastTransmitTime = DateTime.UtcNow;
-            string lastTransmitUser = "";
+            //var lastTransmitTime = DateTime.UtcNow;
+            //string lastTransmitUser = "";
 
             using (var subSocket = new SubscriberSocket())
             {
-                subSocket.Options.ReceiveHighWatermark = 100;
+                //subSocket.Options.ReceiveHighWatermark = 10;
                 subSocket.Connect(address);
                 subSocket.Subscribe("");
 
@@ -209,38 +212,77 @@ namespace GeoVR.Client
 
                     switch (messageTopicReceived)
                     {
-                        case "ClientAudioData":
-                            int length = 0;
-                            ClientAudioData clientAudioData = subSocket.Deserialise<ClientAudioData>(out length);
-                            _bytesReceived += length;
-                            if (clientAudioData.ClientName != _username)  //Don't loopback audio
-                            {
-                                if (clientAudioData.ClientName == lastTransmitUser)
-                                {
-                                    _lastUser = clientAudioData.ClientName;
-                                    lastTransmitTime = DateTime.UtcNow;
-                                    lastTransmitUser = clientAudioData.ClientName;
-                                    playbackQueue.Add(clientAudioData.Data);
-                                }
-                                else if (DateTime.UtcNow > lastTransmitTime.AddMilliseconds(200))
-                                {
-                                    _lastUser = clientAudioData.ClientName;
-                                    lastTransmitTime = DateTime.UtcNow;
-                                    lastTransmitUser = clientAudioData.ClientName;
-                                    playbackQueue.Add(clientAudioData.Data);
-                                }
-                            }
-                            break;
+                        //case "ClientAudioData":
+                        //    int length = 0;
+                        //    ClientAudioData clientAudioData = subSocket.Deserialise<ClientAudioData>(out length);
+                        //    _bytesReceived += length;
+                        //    if (clientAudioData.ClientID != _username)  //Don't loopback audio
+                        //    {
+                        //        if (clientAudioData.ClientID == lastTransmitUser)
+                        //        {
+                        //            _lastUser = clientAudioData.ClientID;
+                        //            lastTransmitTime = DateTime.UtcNow;
+                        //            lastTransmitUser = clientAudioData.ClientID;
+                        //            playbackQueue.Add(clientAudioData.Data);
+                        //        }
+                        //        else if (DateTime.UtcNow > lastTransmitTime.AddMilliseconds(200))
+                        //        {
+                        //            _lastUser = clientAudioData.ClientID;
+                        //            lastTransmitTime = DateTime.UtcNow;
+                        //            lastTransmitUser = clientAudioData.ClientID;
+                        //            playbackQueue.Add(clientAudioData.Data);
+                        //        }
+                        //    }
+                        //    break;
                         case "OneSecondInfo":
                             LastReceivedOneSecondInfo = subSocket.Deserialise<OneSecondInfo>();
                             break;
                     }
                 }
             }
-            taskSub = null;
+            taskDataSub = null;
         }
 
-        private void TaskReceivedAudio(CancellationToken cancelToken, BlockingCollection<byte[]> queue)
+        private void TaskAudioPub(CancellationToken cancelToken, BlockingCollection<byte[]> inputQueue, string address)
+        {
+            string usernameCache = _username;
+            using (var pubSocket = new PublisherSocket())
+            {
+                //pubSocket.Options.SendHighWatermark = 1000;
+                pubSocket.Connect(address);
+
+                while (!cancelToken.IsCancellationRequested)
+                {
+                    if (inputQueue.TryTake(out byte[] data, 500))
+                    {
+                        pubSocket.SendMoreFrame(usernameCache).SendFrame(data);
+                        _bytesSent += data.Length;
+                    }
+                }
+            }
+            taskAudioPub = null;
+        }
+
+        private void TaskAudioSub(CancellationToken cancelToken, BlockingCollection<byte[]> outputQueue, string address)
+        {
+            using (var subSocket = new SubscriberSocket())
+            {
+                //subSocket.Options.ReceiveHighWatermark = 1000;
+                subSocket.Connect(address);
+                subSocket.Subscribe(_username);
+
+                while (!cancelToken.IsCancellationRequested)
+                {
+                    var messageTopicReceived = subSocket.ReceiveFrameString();      //Should always == _username
+                    var messageReceived = subSocket.ReceiveFrameBytes();
+                    _bytesReceived += messageReceived.Length;
+                    outputQueue.Add(messageReceived);
+                }
+            }
+            taskAudioSub = null;
+        }
+
+        private void TaskAudioPlayback(CancellationToken cancelToken, BlockingCollection<byte[]> queue)
         {
             while (!cancelToken.IsCancellationRequested)
             {
@@ -250,7 +292,7 @@ namespace GeoVR.Client
                     _playBuffer.AddSamples(decoded, 0, decodedLength);
                 }
             }
-            taskReceivedAudio = null;
+            taskAudioPlayback = null;
         }
     }
 }

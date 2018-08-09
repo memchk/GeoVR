@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{7B616149-1B4C-4580-9C9B-FC359E68E816}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>VATSIM.Client</RootNamespace>
-    <AssemblyName>VATSIM.Client</AssemblyName>
+    <RootNamespace>GeoVR.Client</RootNamespace>
+    <AssemblyName>GeoVR.Client</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

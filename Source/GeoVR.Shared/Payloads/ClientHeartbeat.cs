@@ -8,6 +8,6 @@ namespace GeoVR.Shared
 {
     public class ClientHeartbeat
     {
-        public string Username { get; set; }
+        public string ClientID { get; set; }
     }
 }

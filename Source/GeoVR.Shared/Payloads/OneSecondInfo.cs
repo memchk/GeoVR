@@ -8,11 +8,11 @@ namespace GeoVR.Shared
 {
     public class OneSecondInfo
     {
-        public List<string> Usernames { get; set; }
+        public List<string> ClientIDs { get; set; }
 
         public OneSecondInfo()
         {
-            Usernames = new List<string>();
+            ClientIDs = new List<string>();
         }
     }
 }
