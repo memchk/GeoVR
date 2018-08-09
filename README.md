@@ -19,5 +19,7 @@ The client sends and receives data as well as adding additional the VHF simulati
 
 Voice data is transmitted at a sufficient bit rate to provide high quality audio.
 
+The world is split up into 1000km square quadrants for each frequency in the VHF spectrum.
 
+In order for minimum overhead on the server the client will fine tune line of sight simulation.
 
