@@ -1,6 +1,7 @@
 ﻿using GMap.NET;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
+using GMap.NET.WindowsForms.Markers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Device.Location;
 
 namespace GeoVR.Client.WinForms
 {
@@ -30,9 +32,78 @@ namespace GeoVR.Client.WinForms
         {
 
             InitMap();
+            AddMarker(51, 0, "EGLL_APP");
+            AddRadioRing(51, 0, 50.0f);
+          
+
+        }
+
+
+        private void AddRadioRing(double lat,double lon, double range)
+        {
+
+            GMapOverlay polygons = new GMapOverlay("polygons");
+         
+            List<PointLatLng> gpollist = new List<PointLatLng>();
+
+            double seg = Math.PI * 2 / 30;
+
+            int y = 0;
+            for (int i = 0; i < 30; i++)
+            {
+                double theta = seg * i;
+                double a = lat + Math.Cos(theta) * range/100*0.75f;
+                double b = lon + Math.Sin(theta) * range/100;
+
+                PointLatLng gpoi = new PointLatLng(a, b);
+
+                gpollist.Add(gpoi);
+            }
+
+            GMapPolygon polygon = new GMapPolygon(gpollist, "Jardin des Tuileries");
+            gMapControl1.Overlays.Add(polygons);
+            polygons.Polygons.Add(polygon);
+          
+        }
+
+        private void AddMarker(double lat,double lon,string name)
+        {
+         
+
+            GMapOverlay markers = new GMapOverlay(name);
+            GMapMarker marker = new GMarkerGoogle(
+                new PointLatLng(lat, lon),
+                GMarkerGoogleType.gray_small);
+
+            marker.ToolTipText = name;
+            gMapControl1.Overlays.Add(markers);
+            markers.Markers.Add(marker);
+            
+
 
             
+
+
         }
+
+
+        
+
+        
+
+        
+
+
+
+        public static double DistanceTwoPoint(double startLat, double startLong, double endLat, double endLong)
+        {
+
+            var startPoint = new GeoCoordinate(startLat, startLong);
+            var endPoint = new GeoCoordinate(endLat, endLong);
+
+            return startPoint.GetDistanceTo(endPoint);
+        }
+
 
         private void InitMap()
         {
@@ -66,14 +137,14 @@ namespace GeoVR.Client.WinForms
 
         private void gMapControl1_OnPositionChanged(PointLatLng point)
         {
-            latitude = gMapControl1.Position.Lat;
-            longitude = gMapControl1.Position.Lng;
+            latitude = point.Lat;
+            longitude = point.Lng;
 
             lonLatLabel.Text = latitude.ToString() + "/" + longitude.ToString();
+            gMapControl1.Overlays.Clear();
+            AddRadioRing(latitude,longitude, txTrackBar.Value);
+            gMapControl1.ReloadMap();
 
-                      
-
-            
         }
 
 
