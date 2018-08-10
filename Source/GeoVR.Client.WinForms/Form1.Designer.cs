@@ -68,6 +68,7 @@
             // 
             // frequencyBox
             // 
+            this.frequencyBox.Enabled = false;
             this.frequencyBox.Location = new System.Drawing.Point(116, 67);
             this.frequencyBox.Name = "frequencyBox";
             this.frequencyBox.Size = new System.Drawing.Size(100, 20);

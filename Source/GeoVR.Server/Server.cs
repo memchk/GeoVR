@@ -140,6 +140,7 @@ namespace GeoVR.Server
                             clientHeartbeats.RemoveAll(c => c.ClientID == clientHeartbeat.ClientID);
                             clientHeartbeats.Add(new ClientHeartbeatReception(clientHeartbeat));
 
+                            //Blodge
                             if (!clientRadioRadii.Any(c => c.ClientID == clientHeartbeat.ClientID))
                                 clientRadioRadii.Add(new ClientRadioRadius() { ClientID = clientHeartbeat.ClientID, ReceiveRadiusM = 80467 * 1.25, TransmitRadiusM = 80467 });
 
@@ -150,6 +151,12 @@ namespace GeoVR.Server
                             ClientPosition clientPosition = subSocket.Deserialise<ClientPosition>(out bytesReceived);
                             serverStatistics.DataBytesReceived += bytesReceived;
                             clientPositions[clientPosition.ClientID] = clientPosition;
+
+
+                            //Blodge
+                            if (!clientRadioRadii.Any(c => c.ClientID == clientPosition.ClientID))
+                                clientRadioRadii.Add(new ClientRadioRadius() { ClientID = clientHeartbeat.ClientID, ReceiveRadiusM = 80467 * 1.25, TransmitRadiusM = 80467 });
+
                             break;
                     }
                 }
