@@ -58,7 +58,7 @@ namespace GeoVR.Client.WinForms
         }
 
 
-        private void AddRadioRing(double lat, double lon, double range)
+        private void AddRadioRing(double lat, double lon, double range, Color color)
         {
             range = range * 2;
             GMapOverlay polygons = new GMapOverlay("polygons");
@@ -71,7 +71,7 @@ namespace GeoVR.Client.WinForms
             for (int i = 0; i < 30; i++)
             {
                 double theta = seg * i;
-                double a = lat + Math.Cos(theta) * range / 100 * 0.75f;
+                double a = lat + Math.Cos(theta) * range / 100;// * 0.75f;
                 double b = lon + Math.Sin(theta) * range / 100;
 
                 PointLatLng gpoi = new PointLatLng(a, b);
@@ -80,6 +80,8 @@ namespace GeoVR.Client.WinForms
             }
 
             GMapPolygon polygon = new GMapPolygon(gpollist, "Jardin des Tuileries");
+            polygon.Stroke = new Pen(color);
+            polygon.Fill = Brushes.Transparent;
             gMapControl1.Overlays.Add(polygons);
             polygons.Polygons.Add(polygon);
 
@@ -171,7 +173,8 @@ namespace GeoVR.Client.WinForms
             {
                 if (positions[i].ClientID != Environment.MachineName + " - " + Environment.UserName)
                     AddMarker(positions[i].LatDeg, positions[i].LonDeg, positions[i].ClientID);
-                AddRadioRing(positions[i].LatDeg, positions[i].LonDeg, radioRadii[i].ReceiveRadiusM / 1609.34);
+                AddRadioRing(positions[i].LatDeg, positions[i].LonDeg, radioRadii[i].ReceiveRadiusM / 1609.34, Color.Red);
+                AddRadioRing(positions[i].LatDeg, positions[i].LonDeg, radioRadii[i].TransmitRadiusM / 1609.34, Color.Blue);
             }
             gMapControl1.ReloadMap();
         }

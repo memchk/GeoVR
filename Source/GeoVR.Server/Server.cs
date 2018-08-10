@@ -141,7 +141,7 @@ namespace GeoVR.Server
                             clientHeartbeats.Add(new ClientHeartbeatReception(clientHeartbeat));
 
                             if (!clientRadioRadii.Any(c => c.ClientID == clientHeartbeat.ClientID))
-                                clientRadioRadii.Add(new ClientRadioRadius() { ClientID = clientHeartbeat.ClientID, ReceiveRadiusM = 80467, TransmitRadiusM = 80467 });
+                                clientRadioRadii.Add(new ClientRadioRadius() { ClientID = clientHeartbeat.ClientID, ReceiveRadiusM = 80467 * 1.25, TransmitRadiusM = 80467 });
 
                             if (!clientReceivingClients.ContainsKey(clientHeartbeat.ClientID))
                                 clientReceivingClients.Add(clientHeartbeat.ClientID, new List<string>());
