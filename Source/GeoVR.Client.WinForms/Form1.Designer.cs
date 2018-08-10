@@ -60,11 +60,11 @@
             // 
             // userNameBox
             // 
+            this.userNameBox.Enabled = false;
             this.userNameBox.Location = new System.Drawing.Point(116, 36);
             this.userNameBox.Name = "userNameBox";
             this.userNameBox.Size = new System.Drawing.Size(100, 20);
             this.userNameBox.TabIndex = 4;
-            this.userNameBox.Text = "EGLL_TWR";
             // 
             // frequencyBox
             // 

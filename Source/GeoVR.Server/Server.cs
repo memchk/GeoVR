@@ -155,7 +155,7 @@ namespace GeoVR.Server
 
                             //Blodge
                             if (!clientRadioRadii.Any(c => c.ClientID == clientPosition.ClientID))
-                                clientRadioRadii.Add(new ClientRadioRadius() { ClientID = clientHeartbeat.ClientID, ReceiveRadiusM = 80467 * 1.25, TransmitRadiusM = 80467 });
+                                clientRadioRadii.Add(new ClientRadioRadius() { ClientID = clientPosition.ClientID, ReceiveRadiusM = 80467 * 1.25, TransmitRadiusM = 80467 });
 
                             break;
                     }
