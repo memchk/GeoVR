@@ -5,7 +5,7 @@ Geographical Virtual Radio
 
 The Geo VR solution provides a C# client/server VOIP implementation simulating radio broadcasting.
 
-The primary goal is for Air Traffic Control simulation however this project has other uses such as Amateur Radio simulation.
+The primary goal is for Air Traffic Control simulation however this project has other uses such as Amateur Radio simulation and Trucker CB Radio simulation.
 
 ## Technology
 
