@@ -46,6 +46,7 @@ namespace GeoVR.Client
 
         public void Start(string ipAddress, string clientID, ClientType clientType)
         {
+            _clientID = clientID;
             taskDataPub = new Task(() => TaskDataPub(cancelTokenSource.Token, dataPublishInputQueue, "tcp://" + ipAddress + ":60001"), TaskCreationOptions.LongRunning);
             taskDataPub.Start();
             taskDataSub = new Task(() => TaskDataSub(cancelTokenSource.Token, "tcp://" + ipAddress + ":60000"), TaskCreationOptions.LongRunning);
@@ -59,7 +60,7 @@ namespace GeoVR.Client
             _clientType = clientType;
             _startTime = DateTime.Now;
             ClientStatistics = new ClientStatistics();
-            _clientID = clientID;
+            
             _segmentFrames = 960;
             _encoder = OpusEncoder.Create(48000, 1, FragLabs.Audio.Codecs.Opus.Application.Voip);
             _encoder.Bitrate = 65536;
