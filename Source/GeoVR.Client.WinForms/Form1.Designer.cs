@@ -35,6 +35,7 @@
             this.gMapControl1 = new GMap.NET.WindowsForms.GMapControl();
             this.lonLatLabel = new System.Windows.Forms.Label();
             this.lblPTT = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -114,17 +115,27 @@
             // lblPTT
             // 
             this.lblPTT.AutoSize = true;
-            this.lblPTT.Location = new System.Drawing.Point(349, 39);
+            this.lblPTT.Location = new System.Drawing.Point(279, 69);
             this.lblPTT.Name = "lblPTT";
             this.lblPTT.Size = new System.Drawing.Size(48, 13);
             this.lblPTT.TabIndex = 14;
             this.lblPTT.Text = "PTT: Off";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(279, 39);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(161, 13);
+            this.label3.TabIndex = 15;
+            this.label3.Text = "The PTT button is the spacebar.";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(740, 618);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.lblPTT);
             this.Controls.Add(this.lonLatLabel);
             this.Controls.Add(this.gMapControl1);
@@ -152,6 +163,7 @@
         private GMap.NET.WindowsForms.GMapControl gMapControl1;
         private System.Windows.Forms.Label lonLatLabel;
         private System.Windows.Forms.Label lblPTT;
+        private System.Windows.Forms.Label label3;
     }
 }
 
