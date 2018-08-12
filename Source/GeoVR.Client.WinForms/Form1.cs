@@ -24,6 +24,7 @@ namespace GeoVR.Client.WinForms
         double latDeg = 51;
         double lonDeg = 0;
         string username = "";
+        private GlobalKeyboardHook _globalKeyboardHook;
 
         public Form1()
         {
@@ -56,6 +57,45 @@ namespace GeoVR.Client.WinForms
                 timer.Tick += Timer_Tick;
             }
             timer.Start();
+            SetupKeyboardHooks();
+        }
+
+        public void SetupKeyboardHooks()
+        {
+            _globalKeyboardHook = new GlobalKeyboardHook();
+            _globalKeyboardHook.KeyboardPressed += OnKeyPressed;
+        }
+
+        private void OnKeyPressed(object sender, GlobalKeyboardHookEventArgs e)
+        {
+            //Debug.WriteLine(e.KeyboardData.VirtualCode);
+
+            if (e.KeyboardData.VirtualCode != 162)
+                return;
+
+            // seems, not needed in the life.
+            //if (e.KeyboardState == GlobalKeyboardHook.KeyboardState.SysKeyDown &&
+            //    e.KeyboardData.Flags == GlobalKeyboardHook.LlkhfAltdown)
+            //{
+            //    MessageBox.Show("Alt + Print Screen");
+            //    e.Handled = true;
+            //}
+            //else
+
+            if (e.KeyboardState == GlobalKeyboardHook.KeyboardState.KeyDown)
+            {
+                PTT(true);
+                e.Handled = false;
+            } else if (e.KeyboardState == GlobalKeyboardHook.KeyboardState.KeyUp)
+            {
+                PTT(false);
+                e.Handled = false;
+            }
+        }
+
+        public void Dispose()
+        {
+            _globalKeyboardHook?.Dispose();
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -66,6 +106,8 @@ namespace GeoVR.Client.WinForms
             //Dispatcher.Invoke(() => { lbStats.Content = string.Format("Sent: {0:N0} B, Received: {1:N0} B", client.ClientStatistics.AudioBytesSent, client.ClientStatistics.AudioBytesReceived); });
             //Dispatcher.Invoke(() => { lbUsers.ItemsSource = client.LastReceivedOneSecondInfo.ClientIDs; });
             RefreshMapMarkers();
+            lblReceivedAudioBytes.Text = "Received audio bytes: " + (clientManager.ClientStatistics.AudioBytesReceived / 1024).ToString() + " kB";
+            label6.Text = string.Join(" ,", clientManager.networkAudioBuffers.Select(x => x.Callsign));
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -148,21 +190,21 @@ namespace GeoVR.Client.WinForms
             //RefreshMapMarkers();
         }
 
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.ControlKey)
-            {
-                PTT(true);
-            }
-        }
+        //private void Form1_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    if (e.KeyCode == Keys.ControlKey)
+        //    {
+        //        PTT(true);
+        //    }
+        //}
 
-        private void Form1_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.ControlKey)
-            {
-                PTT(false);
-            }
-        }
+        //private void Form1_KeyUp(object sender, KeyEventArgs e)
+        //{
+        //    if (e.KeyCode == Keys.ControlKey)
+        //    {
+        //        PTT(false);
+        //    }
+        //}
 
         private void Form1_Deactivate(object sender, EventArgs e)
         {

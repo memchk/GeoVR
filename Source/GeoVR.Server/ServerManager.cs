@@ -114,7 +114,7 @@ namespace GeoVR.Server
             //Recalculate receiving clients for each client
             foreach (var onlineClient in onlineClients)
             {
-                audioReceiversLookup[onlineClient.Callsign].Clear();
+                //audioReceiversLookup[onlineClient.Callsign].Clear();
                 audioReceiversLookup[onlineClient.Callsign] = onlineClient.GetReceivingClients(onlineClients.Where(c => c.Callsign != onlineClient.Callsign)).ToList();
             }
         }

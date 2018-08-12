@@ -41,6 +41,8 @@
             this.btnConnect = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.cbFrequency = new System.Windows.Forms.ComboBox();
+            this.lblReceivedAudioBytes = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -181,11 +183,31 @@
             this.cbFrequency.TabIndex = 18;
             this.cbFrequency.SelectedIndexChanged += new System.EventHandler(this.cbFrequency_SelectedIndexChanged);
             // 
+            // lblReceivedAudioBytes
+            // 
+            this.lblReceivedAudioBytes.AutoSize = true;
+            this.lblReceivedAudioBytes.Location = new System.Drawing.Point(335, 65);
+            this.lblReceivedAudioBytes.Name = "lblReceivedAudioBytes";
+            this.lblReceivedAudioBytes.Size = new System.Drawing.Size(101, 13);
+            this.lblReceivedAudioBytes.TabIndex = 19;
+            this.lblReceivedAudioBytes.Text = "Received audio: 0B";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(335, 92);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(35, 13);
+            this.label6.TabIndex = 20;
+            this.label6.Text = "label6";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(740, 618);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.lblReceivedAudioBytes);
             this.Controls.Add(this.cbFrequency);
             this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.cbOutput);
@@ -203,8 +225,6 @@
             this.Text = "GeoVR Test Client";
             this.Deactivate += new System.EventHandler(this.Form1_Deactivate);
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -225,6 +245,8 @@
         private System.Windows.Forms.Button btnConnect;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox cbFrequency;
+        private System.Windows.Forms.Label lblReceivedAudioBytes;
+        private System.Windows.Forms.Label label6;
     }
 }
 

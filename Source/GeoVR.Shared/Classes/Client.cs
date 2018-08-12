@@ -44,7 +44,7 @@ namespace GeoVR.Shared
                         foreach (var remoteTransceiver in remoteClient.Transceivers)
                         {
                             var distance = Math.DistanceBetweenTwoPointsMeters(localTransceiver.LatDeg, localTransceiver.LonDeg, remoteTransceiver.LatDeg, remoteTransceiver.LonDeg);
-                            if (distance < (localTransceiver.TransmitRadiusMeters + remoteTransceiver.ReceiveRadiusMeters))
+                            if (distance < remoteTransceiver.ReceiveRadiusMeters)
                                 return true;
                         }
                     }

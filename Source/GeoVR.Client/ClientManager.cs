@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using GeoVR.Shared;
+using NAudio.Wave.SampleProviders;
 
 namespace GeoVR.Client
 {
@@ -28,7 +29,8 @@ namespace GeoVR.Client
 
         WaveIn _waveIn;
         WaveOut _waveOut;
-        BufferedWaveProvider _playBuffer;
+        public List<ClientMixerInput> networkAudioBuffers = new List<ClientMixerInput>();
+        BufferedWaveProvider audioEffectBuffer;
         OpusEncoder _encoder;
         OpusDecoder _decoder;
         int _segmentFrames;
@@ -36,7 +38,9 @@ namespace GeoVR.Client
         public ClientStatistics ClientStatistics { get; private set; }
         DateTime _startTime;
         System.Timers.Timer _timer = null;
-        
+
+        //CachedSound clickSample = new CachedSound(@"C:\Users\Mark\Documents\GitHub\GeoVR\Source\GeoVR.Client\Samples\clickfloat.wav");
+
         public AdminInfo LastReceivedAdminInfo { get; set; }
 
         private string callsign;
@@ -45,15 +49,30 @@ namespace GeoVR.Client
         private ClientPositionUpdate _lastClientPosition;
         private ClientFrequencyUpdate _lastClientFrequencyUpdate;
 
+        MixingWaveProvider32 mixer;
+        private readonly EqualizerBand[] bands;
+
+
         public ClientManager()
         {
             LastReceivedAdminInfo = new AdminInfo();
             ClientStatistics = new ClientStatistics();
+            bands = new EqualizerBand[]
+                    {
+                        new EqualizerBand {Bandwidth = 0.8f, Frequency = 100, Gain = -10},
+                        new EqualizerBand {Bandwidth = 0.8f, Frequency = 200, Gain = -10},
+                        new EqualizerBand {Bandwidth = 0.8f, Frequency = 400, Gain = -10},
+                        new EqualizerBand {Bandwidth = 0.8f, Frequency = 800, Gain = -10},
+                        new EqualizerBand {Bandwidth = 0.8f, Frequency = 1200, Gain = 10},
+                        new EqualizerBand {Bandwidth = 0.8f, Frequency = 2400, Gain = 10},
+                        new EqualizerBand {Bandwidth = 0.8f, Frequency = 4800, Gain = -10},
+                        new EqualizerBand {Bandwidth = 0.8f, Frequency = 9600, Gain = -10},
+                    };
         }
 
         public void Start(string serverIpAddress, string clientID, string inputDevice, string outputDevice)
-        {           
-            _startTime = DateTime.Now;            
+        {
+            _startTime = DateTime.Now;
             callsign = clientID;
 
             taskDataPub = new Task(() => TaskDataPub(cancelTokenSource.Token, dataPublishInputQueue, "tcp://" + serverIpAddress + ":60001"), TaskCreationOptions.LongRunning);
@@ -78,16 +97,50 @@ namespace GeoVR.Client
             _waveIn.DataAvailable += _waveIn_DataAvailable;
             _waveIn.WaveFormat = new WaveFormat(48000, 16, 1);
 
-            _playBuffer = new BufferedWaveProvider(new WaveFormat(48000, 16, 1));
+            networkAudioBuffers = new List<ClientMixerInput>
+            {
+                new ClientMixerInput()
+                {
+                    InUse = false,
+                    Provider = new BufferedWaveProvider(new WaveFormat(48000, 16, 1))
+                    //Provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 1))
+                },
+                new ClientMixerInput()
+                {
+                    InUse = false,
+                    Provider = new BufferedWaveProvider(new WaveFormat(48000, 16, 1))
+                    //Provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 1))
+                },
+                new ClientMixerInput()
+                {
+                    InUse = false,
+                    Provider = new BufferedWaveProvider(new WaveFormat(48000, 16, 1))
+                    //Provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 1))
+                },
+                new ClientMixerInput()
+                {
+                    InUse = false,
+                    Provider = new BufferedWaveProvider(new WaveFormat(48000, 16, 1))
+                    //Provider = new BufferedWaveProvider(WaveFormat.CreateIeeeFloatWaveFormat(48000, 1))
+                }
+            };
+
+            mixer = new MixingWaveProvider32();
+            //mixer.ReadFully = true;
+            foreach (var buffer in networkAudioBuffers)
+                mixer.AddInputStream(new SampleToWaveProvider(new Equalizer(new WaveToSampleProvider(new Wave16ToFloatProvider(buffer.Provider)), bands)));
+            //_playBuffer = new BufferedWaveProvider(mixer.WaveFormat);
+            //mixer.AddInputStream(_playBuffer);
             taskAudioPlayback = new Task(() => TaskAudioPlayback(cancelTokenSource.Token, audioPlaybackQueue), TaskCreationOptions.LongRunning);
             taskAudioPlayback.Start();
 
-            _waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback());
+            //_waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback());
+            _waveOut = new WaveOut();
             Console.WriteLine("Output device: " + WaveOut.GetCapabilities(0).ProductName);
             _waveOut.DeviceNumber = MapOutputDevice(outputDevice);
             _waveOut.DesiredLatency = 200;      //Default is 300
-            _waveOut.Init(_playBuffer);
-
+            //_waveOut.Init(_playBuffer);
+            _waveOut.Init(mixer);
             _waveOut.Play();
             _waveIn.StartRecording();
 
@@ -111,7 +164,7 @@ namespace GeoVR.Client
             _waveOut.Stop();
             _waveOut.Dispose();
             _waveOut = null;
-            _playBuffer = null;
+            //_playBuffer = null;
             _encoder.Dispose();
             _encoder = null;
             _decoder.Dispose();
@@ -202,6 +255,10 @@ namespace GeoVR.Client
 
             if (_lastClientFrequencyUpdate != null)                 //If the server is restarted, this will resync it
                 dataPublishInputQueue.Add(_lastClientFrequencyUpdate);
+
+            //mixer.AddInputStream(new SampleToWaveProvider2(new CachedSoundSampleProvider(clickSample)));
+            //var reader = new WaveFileReader(@"C:\Users\Mark\Documents\GitHub\GeoVR\Source\GeoVR.Client\Samples\clickfloattest.wav");
+            //mixer.AddInputStream(reader);
         }
 
         byte[] _notEncodedBuffer = new byte[0];
@@ -337,23 +394,58 @@ namespace GeoVR.Client
 
         private void TaskAudioPlayback(CancellationToken cancelToken, BlockingCollection<ClientAudio> queue)
         {
-            var lastTransmitTime = DateTime.UtcNow;
-            string lastTransmitClientID = "";
+            //var lastTransmitTime = DateTime.UtcNow;
+            //string lastTransmitClientID = "";
 
             while (!cancelToken.IsCancellationRequested)
             {
-                if (queue.TryTake(out ClientAudio data, 500))       //We can use the clientID to input into different mixer channels later
+                if (queue.TryTake(out ClientAudio data, 100))
                 {
-                    if ((data.Callsign == lastTransmitClientID) || (DateTime.UtcNow > lastTransmitTime.AddMilliseconds(200)))
+                    byte[] decoded = _decoder.Decode(data.Data, data.Data.Length, out int decodedLength);
+
+                    if (networkAudioBuffers.Any(b => b.Callsign == data.Callsign))
                     {
-                        lastTransmitTime = DateTime.UtcNow;
-                        lastTransmitClientID = data.Callsign;
-                        byte[] decoded = _decoder.Decode(data.Data, data.Data.Length, out int decodedLength);
-                        _playBuffer.AddSamples(decoded, 0, decodedLength);
+                        var buffer = networkAudioBuffers.First(b => b.Callsign == data.Callsign);
+                        buffer.LastUsedUTC = DateTime.UtcNow;
+                        buffer.Provider.AddSamples(decoded, 0, decodedLength);
                     }
+                    else if (networkAudioBuffers.Any(b => b.InUse == false))
+                    {
+                        var reader = new WaveFileReader("Samples\\click_float.wav");     //Start of transmission
+                        mixer.AddInputStream(reader);
+                        var buffer = networkAudioBuffers.First(b => b.InUse == false);
+                        buffer.InUse = true;
+                        buffer.Callsign = data.Callsign;
+                        buffer.LastUsedUTC = DateTime.UtcNow;
+                        buffer.Provider.AddSamples(decoded, 0, decodedLength);
+                    }
+                }
+                else
+                {
+                    CleanupNetworkAudioBuffers();
                 }
             }
             taskAudioPlayback = null;
+        }
+
+        private void CleanupNetworkAudioBuffers()
+        {
+            bool soundPlayed = false;
+            foreach (var buffer in networkAudioBuffers.Where(b => b.InUse))
+            {
+                var pastPoint = DateTime.UtcNow.AddMilliseconds(-200);
+                if (buffer.LastUsedUTC < pastPoint)
+                {
+                    buffer.InUse = false;
+                    buffer.Callsign = "";
+                    if (!soundPlayed)
+                    {
+                        var reader = new WaveFileReader("Samples\\click_float.wav");     //End of transmission
+                        mixer.AddInputStream(reader);
+                        soundPlayed = true;
+                    }
+                }
+            }
         }
     }
 }
