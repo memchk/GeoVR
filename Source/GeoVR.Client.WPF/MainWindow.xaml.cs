@@ -21,7 +21,7 @@ namespace GeoVR.Client.WPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        Client client = new Client();
+        ClientManager client = new ClientManager();
         string address = "antifaffvoice.vatsim.uk";
         System.Timers.Timer timer = null;
         DateTime _startTime;
@@ -29,7 +29,7 @@ namespace GeoVR.Client.WPF
         public MainWindow()
         {
             InitializeComponent();
-            client.Start(address, Environment.MachineName + " - " + Environment.UserName, Shared.ClientType.Mobile);
+            client.Start(address, Environment.MachineName + " - " + Environment.UserName, Shared.ClientType.RadioMobile);
             if (timer == null)
             {
                 timer = new System.Timers.Timer();
@@ -57,7 +57,7 @@ namespace GeoVR.Client.WPF
             //var bpsSend = client.BytesSent / timeDiff.TotalSeconds;
             //var bpsReceive = client.B    ytesReceived / timeDiff.TotalSeconds;
             Dispatcher.Invoke(() => { lbStats.Content = string.Format("Sent: {0:N0} B, Received: {1:N0} B", client.ClientStatistics.AudioBytesSent, client.ClientStatistics.AudioBytesReceived); });
-            Dispatcher.Invoke(() => { lbUsers.ItemsSource = client.LastReceivedOneSecondInfo.ClientIDs; });
+            Dispatcher.Invoke(() => { lbUsers.ItemsSource = client.LastReceivedAdminInfo.Callsigns; });
         }
 
         private void Window_LostFocus(object sender, RoutedEventArgs e)

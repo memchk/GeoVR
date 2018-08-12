@@ -14,7 +14,7 @@ using GeoVR.Shared;
 
 namespace GeoVR.Client
 {
-    public class Client
+    public class ClientManager
     {
         private CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
         private Task taskDataPub;
@@ -36,31 +36,35 @@ namespace GeoVR.Client
         public ClientStatistics ClientStatistics { get; private set; }
         DateTime _startTime;
         System.Timers.Timer _timer = null;
-        bool _ptt = false;
+        
+        public AdminInfo LastReceivedAdminInfo { get; set; }
 
-        public AdminOneSecondInfo LastReceivedOneSecondInfo { get; set; }
+        private string callsign;
+        private bool ptt = false;
+        private bool started = false;
+        private ClientPositionUpdate _lastClientPosition;
+        private ClientFrequencyUpdate _lastClientFrequencyUpdate;
 
-        private string _clientID;
-        private ClientType _clientType;
-        private ClientPosition _lastClientPosition;
-
-        public void Start(string ipAddress, string clientID, ClientType clientType)
+        public ClientManager()
         {
-            _clientID = clientID;
-            taskDataPub = new Task(() => TaskDataPub(cancelTokenSource.Token, dataPublishInputQueue, "tcp://" + ipAddress + ":60001"), TaskCreationOptions.LongRunning);
+            LastReceivedAdminInfo = new AdminInfo();
+            ClientStatistics = new ClientStatistics();
+        }
+
+        public void Start(string serverIpAddress, string clientID, string inputDevice, string outputDevice)
+        {           
+            _startTime = DateTime.Now;            
+            callsign = clientID;
+
+            taskDataPub = new Task(() => TaskDataPub(cancelTokenSource.Token, dataPublishInputQueue, "tcp://" + serverIpAddress + ":60001"), TaskCreationOptions.LongRunning);
             taskDataPub.Start();
-            taskDataSub = new Task(() => TaskDataSub(cancelTokenSource.Token, "tcp://" + ipAddress + ":60000"), TaskCreationOptions.LongRunning);
+            taskDataSub = new Task(() => TaskDataSub(cancelTokenSource.Token, "tcp://" + serverIpAddress + ":60000"), TaskCreationOptions.LongRunning);
             taskDataSub.Start();
-            taskAudioPub = new Task(() => TaskAudioPub(cancelTokenSource.Token, audioPublishInputQueue, "tcp://" + ipAddress + ":60003"), TaskCreationOptions.LongRunning);
+            taskAudioPub = new Task(() => TaskAudioPub(cancelTokenSource.Token, audioPublishInputQueue, "tcp://" + serverIpAddress + ":60003"), TaskCreationOptions.LongRunning);
             taskAudioPub.Start();
-            taskAudioSub = new Task(() => TaskAudioSub(cancelTokenSource.Token, audioPlaybackQueue, "tcp://" + ipAddress + ":60002"), TaskCreationOptions.LongRunning);
+            taskAudioSub = new Task(() => TaskAudioSub(cancelTokenSource.Token, audioPlaybackQueue, "tcp://" + serverIpAddress + ":60002"), TaskCreationOptions.LongRunning);
             taskAudioSub.Start();
 
-            LastReceivedOneSecondInfo = new AdminOneSecondInfo();
-            _clientType = clientType;
-            _startTime = DateTime.Now;
-            ClientStatistics = new ClientStatistics();
-            
             _segmentFrames = 960;
             _encoder = OpusEncoder.Create(48000, 1, FragLabs.Audio.Codecs.Opus.Application.Voip);
             _encoder.Bitrate = 65536;
@@ -70,7 +74,7 @@ namespace GeoVR.Client
             _waveIn = new WaveIn(WaveCallbackInfo.FunctionCallback());
             _waveIn.BufferMilliseconds = 50;
             Console.WriteLine("Input device: " + WaveIn.GetCapabilities(0).ProductName);
-            _waveIn.DeviceNumber = 0;
+            _waveIn.DeviceNumber = MapInputDevice(inputDevice);
             _waveIn.DataAvailable += _waveIn_DataAvailable;
             _waveIn.WaveFormat = new WaveFormat(48000, 16, 1);
 
@@ -80,8 +84,8 @@ namespace GeoVR.Client
 
             _waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback());
             Console.WriteLine("Output device: " + WaveOut.GetCapabilities(0).ProductName);
-            _waveOut.DeviceNumber = 0;
-            _waveOut.DesiredLatency = 150;      //Default is 300
+            _waveOut.DeviceNumber = MapOutputDevice(outputDevice);
+            _waveOut.DesiredLatency = 200;      //Default is 300
             _waveOut.Init(_playBuffer);
 
             _waveOut.Play();
@@ -94,6 +98,8 @@ namespace GeoVR.Client
                 _timer.Elapsed += _timer_Elapsed;
             }
             _timer.Start();
+
+            started = true;
         }
 
         public void Stop()
@@ -111,19 +117,76 @@ namespace GeoVR.Client
             _decoder.Dispose();
             _decoder = null;
             cancelTokenSource.Cancel();
+            taskDataPub.Wait();
+            taskDataSub.Wait();
+            taskAudioPub.Wait();
+            taskAudioSub.Wait();
+            taskAudioPlayback.Wait();
+            started = false;
         }
 
-        public void PTT(bool ptt)
+        public bool PTT(bool ptt)
         {
-            _ptt = ptt;
+            if (started)
+            {
+                this.ptt = ptt;
+                return true;
+            }
+            else
+            {
+                this.ptt = false;
+                return false;
+            }
         }
 
-        public void SetPosition(double latDeg, double lonDeg, double groundAltM)
+        public void Frequency(string frequency)
         {
-            //double transmitRadiusMeters = 101.07 * groundAltM + 1852.0;
-            //double receiveRadiusMeters = transmitRadiusMeters * 1.5;
-            _lastClientPosition = new ClientPosition() { ClientID = _clientID, LatDeg = latDeg, LonDeg = lonDeg, GroundAltM = groundAltM };
-            dataPublishInputQueue.Add(_lastClientPosition);
+            _lastClientFrequencyUpdate = new ClientFrequencyUpdate() { Callsign = callsign, Frequency = frequency };
+            if (started)
+                dataPublishInputQueue.Add(_lastClientFrequencyUpdate);         //Server will just ignore if it's a fixed position
+        }
+
+        public void Position(double latDeg, double lonDeg, double groundAltM)
+        {
+            _lastClientPosition = new ClientPositionUpdate() { Callsign = callsign, LatDeg = latDeg, LonDeg = lonDeg, GroundAltMeters = groundAltM };
+            if (started)
+                dataPublishInputQueue.Add(_lastClientPosition);         //Server will just ignore if it's a fixed position
+        }
+
+        public IEnumerable<string> GetInputDevices()
+        {
+            for (int i = 0; i < WaveIn.DeviceCount; i++)
+            {
+                yield return WaveIn.GetCapabilities(i).ProductName;
+            }
+        }
+
+        public IEnumerable<string> GetOutputDevices()
+        {
+            for (int i = 0; i < WaveOut.DeviceCount; i++)
+            {
+                yield return WaveOut.GetCapabilities(i).ProductName;
+            }
+        }
+
+        private int MapInputDevice(string inputDevice)
+        {
+            for (int i = 0; i < WaveIn.DeviceCount; i++)
+            {
+                if (WaveIn.GetCapabilities(i).ProductName == inputDevice)
+                    return i;
+            }
+            return 0;       //Else use default
+        }
+
+        private int MapOutputDevice(string inputDevice)
+        {
+            for (int i = 0; i < WaveOut.DeviceCount; i++)
+            {
+                if (WaveOut.GetCapabilities(i).ProductName == inputDevice)
+                    return i;
+            }
+            return 0;       //Else use default
         }
 
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -132,9 +195,13 @@ namespace GeoVR.Client
             var bpsSend = ClientStatistics.AudioBytesSent / timeDiff.TotalSeconds;
             var bpsReceive = ClientStatistics.AudioBytesReceived / timeDiff.TotalSeconds;
             Console.WriteLine("Send rate: {0:N1} B/s, Receive rate: {1:N1} B/s", bpsSend, bpsReceive);
-            dataPublishInputQueue.Add(new ClientHeartbeat() { ClientID = _clientID });
-            if (_lastClientPosition != null)
+            dataPublishInputQueue.Add(new ClientHeartbeat() { Callsign = callsign });
+
+            if (_lastClientPosition != null)                        //If the server is restarted, this will resync it
                 dataPublishInputQueue.Add(_lastClientPosition);
+
+            if (_lastClientFrequencyUpdate != null)                 //If the server is restarted, this will resync it
+                dataPublishInputQueue.Add(_lastClientFrequencyUpdate);
         }
 
         byte[] _notEncodedBuffer = new byte[0];
@@ -147,7 +214,7 @@ namespace GeoVR.Client
                 soundBuffer[i + _notEncodedBuffer.Length] = e.Buffer[i];
 
             int byteCap = _bytesPerSegment;
-            int segmentCount = (int)Math.Floor((decimal)soundBuffer.Length / byteCap);
+            int segmentCount = (int)System.Math.Floor((decimal)soundBuffer.Length / byteCap);
             int segmentsEnd = segmentCount * byteCap;
             int notEncodedCount = soundBuffer.Length - segmentsEnd;
             _notEncodedBuffer = new byte[notEncodedCount];
@@ -166,7 +233,7 @@ namespace GeoVR.Client
                 ClientStatistics.AudioBytesEncoded += len;
                 //buff = _decoder.Decode(buff, len, out len);
                 //_playBuffer.AddSamples(buff, 0, len);
-                if (_ptt)
+                if (ptt & started)
                 {
                     byte[] trimmedBuff = new byte[len];
                     Buffer.BlockCopy(buff, 0, trimmedBuff, 0, len);
@@ -191,8 +258,11 @@ namespace GeoVR.Client
                             case "ClientHeartbeat":
                                 pubSocket.Serialise<ClientHeartbeat>(data);
                                 break;
-                            case "ClientPosition":
-                                pubSocket.Serialise<ClientPosition>(data);
+                            case "ClientPositionUpdate":
+                                pubSocket.Serialise<ClientPositionUpdate>(data);
+                                break;
+                            case "ClientFrequencyUpdate":
+                                pubSocket.Serialise<ClientFrequencyUpdate>(data);
                                 break;
                         }
                     }
@@ -216,8 +286,8 @@ namespace GeoVR.Client
 
                     switch (messageTopicReceived)
                     {
-                        case "AdminOneSecondInfo":
-                            LastReceivedOneSecondInfo = subSocket.Deserialise<AdminOneSecondInfo>();
+                        case "AdminInfo":
+                            LastReceivedAdminInfo = subSocket.Deserialise<AdminInfo>();
                             break;
                     }
                 }
@@ -227,7 +297,7 @@ namespace GeoVR.Client
 
         private void TaskAudioPub(CancellationToken cancelToken, BlockingCollection<byte[]> inputQueue, string address)
         {
-            string usernameCache = _clientID;
+            string usernameCache = callsign;
             using (var pubSocket = new PublisherSocket())
             {
                 //pubSocket.Options.SendHighWatermark = 1000;
@@ -251,7 +321,7 @@ namespace GeoVR.Client
             {
                 //subSocket.Options.ReceiveHighWatermark = 1000;
                 subSocket.Connect(address);
-                subSocket.Subscribe(_clientID);
+                subSocket.Subscribe(callsign);
 
                 while (!cancelToken.IsCancellationRequested)
                 {
@@ -274,10 +344,10 @@ namespace GeoVR.Client
             {
                 if (queue.TryTake(out ClientAudio data, 500))       //We can use the clientID to input into different mixer channels later
                 {
-                    if ((data.ClientID == lastTransmitClientID) || (DateTime.UtcNow > lastTransmitTime.AddMilliseconds(200)))
+                    if ((data.Callsign == lastTransmitClientID) || (DateTime.UtcNow > lastTransmitTime.AddMilliseconds(200)))
                     {
                         lastTransmitTime = DateTime.UtcNow;
-                        lastTransmitClientID = data.ClientID;
+                        lastTransmitClientID = data.Callsign;
                         byte[] decoded = _decoder.Decode(data.Data, data.Data.Length, out int decodedLength);
                         _playBuffer.AddSamples(decoded, 0, decodedLength);
                     }

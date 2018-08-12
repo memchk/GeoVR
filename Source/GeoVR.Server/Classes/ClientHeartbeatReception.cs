@@ -13,7 +13,7 @@ namespace GeoVR.Server
 
         public ClientHeartbeatReception(ClientHeartbeat clientHeartbeat)
         {
-            ClientID = clientHeartbeat.ClientID;
+            Callsign = clientHeartbeat.Callsign;
             ReceivedUTC = DateTime.UtcNow;
         }
     }

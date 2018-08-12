@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace GeoVR.Shared
 {
-    public enum ClientType
+    public class ClientAudio
     {
-        GroundStation,
-        Mobile
+        public string Callsign { get; set; }
+        public byte[] Data { get; set; }
     }
 }

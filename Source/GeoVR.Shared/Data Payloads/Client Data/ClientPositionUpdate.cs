@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace GeoVR.Shared
 {
-    public class ClientPosition
+    public class ClientPositionUpdate
     {
-        public string ClientID { get; set; }
+        public string Callsign { get; set; }
         public double LatDeg { get; set; }
         public double LonDeg { get; set; }
-        public double GroundAltM { get; set; }
+        public double GroundAltMeters { get; set; }
     }
 }

@@ -10,7 +10,7 @@ namespace GeoVR.Server.ConsoleApp
     {
         static void Main(string[] args)
         {
-            Server server = new Server();
+            ServerManager server = new ServerManager();
             server.Start();
             Console.WriteLine("Server started");
             Console.ReadKey();

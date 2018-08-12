@@ -53,10 +53,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\ClientConfigurationManager.cs" />
     <Compile Include="Classes\ClientHeartbeatReception.cs" />
-    <Compile Include="Classes\ClientSubscriptionData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Server.cs" />
+    <Compile Include="ServerManager.cs" />
     <Compile Include="ServerStatistics.cs" />
   </ItemGroup>
   <ItemGroup>

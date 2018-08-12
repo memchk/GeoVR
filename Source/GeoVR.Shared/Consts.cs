@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace GeoVR.Shared
 {
-    public class ClientHeartbeat
+    public static class Consts
     {
-        public string ClientID { get; set; }
+        public const double MilesToMeters = 1609.34;
     }
 }

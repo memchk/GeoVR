@@ -30,50 +30,45 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.userNameBox = new System.Windows.Forms.TextBox();
-            this.frequencyBox = new System.Windows.Forms.TextBox();
+            this.tbUsername = new System.Windows.Forms.TextBox();
             this.gMapControl1 = new GMap.NET.WindowsForms.GMapControl();
             this.lonLatLabel = new System.Windows.Forms.Label();
             this.lblPTT = new System.Windows.Forms.Label();
+            this.cbInput = new System.Windows.Forms.ComboBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.cbOutput = new System.Windows.Forms.ComboBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.btnConnect = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
+            this.cbFrequency = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(35, 41);
+            this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(74, 16);
+            this.label1.Size = new System.Drawing.Size(83, 16);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Username:";
+            this.label1.Text = "Input device:";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(35, 67);
+            this.label2.Location = new System.Drawing.Point(11, 89);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(75, 16);
             this.label2.TabIndex = 1;
             this.label2.Text = "Frequency:";
             // 
-            // userNameBox
+            // tbUsername
             // 
-            this.userNameBox.Enabled = false;
-            this.userNameBox.Location = new System.Drawing.Point(116, 36);
-            this.userNameBox.Name = "userNameBox";
-            this.userNameBox.Size = new System.Drawing.Size(100, 20);
-            this.userNameBox.TabIndex = 4;
-            // 
-            // frequencyBox
-            // 
-            this.frequencyBox.Enabled = false;
-            this.frequencyBox.Location = new System.Drawing.Point(116, 67);
-            this.frequencyBox.Name = "frequencyBox";
-            this.frequencyBox.Size = new System.Drawing.Size(100, 20);
-            this.frequencyBox.TabIndex = 5;
-            this.frequencyBox.Text = "118.500";
+            this.tbUsername.Location = new System.Drawing.Point(117, 62);
+            this.tbUsername.Name = "tbUsername";
+            this.tbUsername.Size = new System.Drawing.Size(212, 20);
+            this.tbUsername.TabIndex = 4;
             // 
             // gMapControl1
             // 
@@ -116,33 +111,92 @@
             // lblPTT
             // 
             this.lblPTT.AutoSize = true;
-            this.lblPTT.Location = new System.Drawing.Point(279, 69);
+            this.lblPTT.Location = new System.Drawing.Point(335, 38);
             this.lblPTT.Name = "lblPTT";
-            this.lblPTT.Size = new System.Drawing.Size(48, 13);
+            this.lblPTT.Size = new System.Drawing.Size(58, 13);
             this.lblPTT.TabIndex = 14;
-            this.lblPTT.Text = "PTT: Off";
+            this.lblPTT.Text = "Radio: Idle";
+            // 
+            // cbInput
+            // 
+            this.cbInput.FormattingEnabled = true;
+            this.cbInput.Location = new System.Drawing.Point(117, 8);
+            this.cbInput.Name = "cbInput";
+            this.cbInput.Size = new System.Drawing.Size(212, 21);
+            this.cbInput.TabIndex = 16;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(12, 37);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(93, 16);
+            this.label4.TabIndex = 0;
+            this.label4.Text = "Output device:";
+            // 
+            // cbOutput
+            // 
+            this.cbOutput.FormattingEnabled = true;
+            this.cbOutput.Location = new System.Drawing.Point(117, 35);
+            this.cbOutput.Name = "cbOutput";
+            this.cbOutput.Size = new System.Drawing.Size(212, 21);
+            this.cbOutput.TabIndex = 16;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(12, 63);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(74, 16);
+            this.label5.TabIndex = 0;
+            this.label5.Text = "Username:";
+            // 
+            // btnConnect
+            // 
+            this.btnConnect.Location = new System.Drawing.Point(117, 114);
+            this.btnConnect.Name = "btnConnect";
+            this.btnConnect.Size = new System.Drawing.Size(212, 23);
+            this.btnConnect.TabIndex = 17;
+            this.btnConnect.Text = "Connect";
+            this.btnConnect.UseVisualStyleBackColor = true;
+            this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(279, 39);
+            this.label3.Location = new System.Drawing.Point(335, 11);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(161, 13);
             this.label3.TabIndex = 15;
             this.label3.Text = "The PTT button is the spacebar.";
+            // 
+            // cbFrequency
+            // 
+            this.cbFrequency.FormattingEnabled = true;
+            this.cbFrequency.Location = new System.Drawing.Point(117, 88);
+            this.cbFrequency.Name = "cbFrequency";
+            this.cbFrequency.Size = new System.Drawing.Size(212, 21);
+            this.cbFrequency.TabIndex = 18;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(740, 618);
+            this.Controls.Add(this.cbFrequency);
+            this.Controls.Add(this.btnConnect);
+            this.Controls.Add(this.cbOutput);
+            this.Controls.Add(this.cbInput);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.lblPTT);
             this.Controls.Add(this.lonLatLabel);
             this.Controls.Add(this.gMapControl1);
-            this.Controls.Add(this.frequencyBox);
-            this.Controls.Add(this.userNameBox);
+            this.Controls.Add(this.tbUsername);
             this.Controls.Add(this.label2);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.label1);
             this.Name = "Form1";
             this.Text = "GeoVR Test Client";
@@ -159,12 +213,17 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox userNameBox;
-        private System.Windows.Forms.TextBox frequencyBox;
+        private System.Windows.Forms.TextBox tbUsername;
         private GMap.NET.WindowsForms.GMapControl gMapControl1;
         private System.Windows.Forms.Label lonLatLabel;
         private System.Windows.Forms.Label lblPTT;
+        private System.Windows.Forms.ComboBox cbInput;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ComboBox cbOutput;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Button btnConnect;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ComboBox cbFrequency;
     }
 }
 

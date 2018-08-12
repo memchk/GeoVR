@@ -18,17 +18,37 @@ namespace GeoVR.Client.WinForms
 {
     public partial class Form1 : Form
     {
-        Client client = new Client();
+        ClientManager clientManager = new ClientManager();
         string address = "antifaffvoice.vatsim.uk";
         System.Windows.Forms.Timer timer = null;
-        double latitude = 51;
-        double longitude = 0;
+        double latDeg = 51;
+        double lonDeg = 0;
+        string username = "";
 
         public Form1()
         {
             InitializeComponent();
             this.KeyPreview = true;
-            client.Start(address, Environment.MachineName + " - " + Environment.UserName, Shared.ClientType.Mobile);
+
+            foreach (var inputDevice in clientManager.GetInputDevices())
+            {
+                cbInput.Items.Add(inputDevice);
+            }
+
+            foreach (var outputDevice in clientManager.GetOutputDevices())
+            {
+                cbOutput.Items.Add(outputDevice);
+            }
+            cbInput.SelectedIndex = 0;
+            cbOutput.SelectedIndex = 0;
+
+            cbFrequency.Items.Add("118.500");
+            cbFrequency.Items.Add("121.900");
+            cbFrequency.Items.Add("EGLL Controllers Conference Call");
+            cbFrequency.SelectedIndex = 0;
+
+            tbUsername.Text = Environment.UserName;
+
             if (timer == null)
             {
                 timer = new System.Windows.Forms.Timer();
@@ -46,19 +66,15 @@ namespace GeoVR.Client.WinForms
             //Dispatcher.Invoke(() => { lbStats.Content = string.Format("Sent: {0:N0} B, Received: {1:N0} B", client.ClientStatistics.AudioBytesSent, client.ClientStatistics.AudioBytesReceived); });
             //Dispatcher.Invoke(() => { lbUsers.ItemsSource = client.LastReceivedOneSecondInfo.ClientIDs; });
             RefreshMapMarkers();
-            client.SetPosition(latitude, longitude, 0);
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
             InitMap();
-
-            RefreshMapMarkers();
+            //RefreshMapMarkers();
         }
 
-
-        private void AddRadioRing(double lat, double lon, double range, Color color)
+        private void AddRadioRing(double lat, double lon, double range, Color color, string name)
         {
             range = range * 2;
             GMapOverlay polygons = new GMapOverlay("polygons");
@@ -79,7 +95,7 @@ namespace GeoVR.Client.WinForms
                 gpollist.Add(gpoi);
             }
 
-            GMapPolygon polygon = new GMapPolygon(gpollist, "Jardin des Tuileries");
+            GMapPolygon polygon = new GMapPolygon(gpollist, name);
             polygon.Stroke = new Pen(color);
             polygon.Fill = Brushes.Transparent;
             gMapControl1.Overlays.Add(polygons);
@@ -126,9 +142,10 @@ namespace GeoVR.Client.WinForms
 
         private void gMapControl1_OnPositionChanged(PointLatLng point)
         {
-            latitude = point.Lat;
-            longitude = point.Lng;
-            RefreshMapMarkers();
+            latDeg = point.Lat;
+            lonDeg = point.Lng;
+            clientManager.Position(latDeg, lonDeg, 9144);
+            //RefreshMapMarkers();
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -154,8 +171,7 @@ namespace GeoVR.Client.WinForms
 
         private void PTT(bool active)
         {
-            client.PTT(active);
-            if (active)
+            if (clientManager.PTT(active) & active)
                 lblPTT.Text = "Radio: Transmitting";
             else
                 lblPTT.Text = "Radio: Idle";
@@ -163,20 +179,92 @@ namespace GeoVR.Client.WinForms
 
         private void RefreshMapMarkers()
         {
-            lonLatLabel.Text = latitude.ToString() + "/" + longitude.ToString();
+            lonLatLabel.Text = latDeg.ToString() + "/" + lonDeg.ToString();
 
             gMapControl1.Overlays.Clear();
 
-            var positions = client.LastReceivedOneSecondInfo.ClientPositions;
-            var radioRadii = client.LastReceivedOneSecondInfo.ClientRadioRadii;
-            for (int i = 0; i < positions.Count; i++)
+            foreach (var client in clientManager.LastReceivedAdminInfo.Clients)
             {
-                if (positions[i].ClientID != Environment.MachineName + " - " + Environment.UserName)
-                    AddMarker(positions[i].LatDeg, positions[i].LonDeg, positions[i].ClientID);
-                AddRadioRing(positions[i].LatDeg, positions[i].LonDeg, radioRadii[i].ReceiveRadiusM / 1609.34, Color.Red);
-                AddRadioRing(positions[i].LatDeg, positions[i].LonDeg, radioRadii[i].TransmitRadiusM / 1609.34, Color.Blue);
+                switch (client.Type)
+                {
+                    case Shared.ClientType.RadioMobile:
+                        if (client.Online)
+                        {
+                            if (client.Callsign != username)
+                                AddMarker(client.Transceivers[0].LatDeg, client.Transceivers[0].LonDeg, client.Callsign);
+                            AddRadioRing(client.Transceivers[0].LatDeg, client.Transceivers[0].LonDeg, client.Transceivers[0].ReceiveRadiusMeters / 1609.34, Color.Red, client.Callsign + " receive");
+                            AddRadioRing(client.Transceivers[0].LatDeg, client.Transceivers[0].LonDeg, client.Transceivers[0].TransmitRadiusMeters / 1609.34, Color.Blue, client.Callsign + " transmit");
+                        }
+                        break;
+                    case Shared.ClientType.RadioFixed:
+                        foreach (var transceiver in client.Transceivers)
+                        {
+                            AddMarker(transceiver.LatDeg, transceiver.LonDeg, client.Callsign);
+                            AddRadioRing(transceiver.LatDeg, transceiver.LonDeg, transceiver.ReceiveRadiusMeters / 1609.34, Color.Gray, client.Callsign + " receive");
+                            AddRadioRing(transceiver.LatDeg, transceiver.LonDeg, transceiver.TransmitRadiusMeters / 1609.34, Color.Gray, client.Callsign + " transmit");
+                        }
+                        break;
+                }
+
             }
-            gMapControl1.ReloadMap();
+            //gMapControl1.ReloadMap();
+        }
+
+        private void btnConnect_Click(object sender, EventArgs e)
+        {
+            //Validation
+            var username = tbUsername.Text.Trim();
+            var frequency = (string)cbFrequency.SelectedItem;
+
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                MessageBox.Show("Username invalid.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(frequency))
+            {
+                MessageBox.Show("Frequency invalid.");
+                return;
+            }
+
+            if (cbInput.SelectedIndex < 0)
+            {
+                MessageBox.Show("Input device invalid.");
+                return;
+            }
+
+            if (cbOutput.SelectedIndex < 0)
+            {
+                MessageBox.Show("Output device invalid.");
+                return;
+            }
+
+            cbInput.Enabled = false;
+            cbOutput.Enabled = false;
+            tbUsername.Enabled = false;
+            btnConnect.Enabled = false;
+            lblPTT.Select();
+
+            this.username = username;
+            var inputDevice = (string)cbInput.SelectedItem;
+            var outputDevice = (string)cbOutput.SelectedItem;
+            clientManager.Start(address, username, inputDevice, outputDevice);
+            clientManager.Position(latDeg, lonDeg, 9144);
+            clientManager.Frequency(frequency);
+        }
+
+        private void tbFrequency_TextChanged(object sender, EventArgs e)
+        {
+            var frequency = (string)cbFrequency.SelectedItem;
+
+            if (string.IsNullOrWhiteSpace(frequency))
+            {
+                MessageBox.Show("Frequency invalid.");
+                return;
+            }
+
+            clientManager.Frequency(frequency);
         }
     }
 }

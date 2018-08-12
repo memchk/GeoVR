@@ -41,6 +41,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Device" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -50,15 +51,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\Client.cs" />
+    <Compile Include="Classes\Config\ClientConfig.cs" />
+    <Compile Include="Classes\Config\ClientType.cs" />
+    <Compile Include="Consts.cs" />
     <Compile Include="Extension Methods\PublisherSocketExtensions.cs" />
     <Compile Include="Extension Methods\SubscriberSocketExtensions.cs" />
-    <Compile Include="Payloads\ClientAudio.cs" />
-    <Compile Include="Payloads\ClientHeartbeat.cs" />
-    <Compile Include="Payloads\ClientPosition.cs" />
-    <Compile Include="Payloads\AdminOneSecondInfo.cs" />
-    <Compile Include="Payloads\ClientRadioRadius.cs" />
+    <Compile Include="Math.cs" />
+    <Compile Include="Classes\ClientAudio.cs" />
+    <Compile Include="Data Payloads\Client Data\ClientFrequencyUpdate.cs" />
+    <Compile Include="Data Payloads\Client Data\ClientHeartbeat.cs" />
+    <Compile Include="Data Payloads\Client Data\ClientPositionUpdate.cs" />
+    <Compile Include="Data Payloads\Server Data\AdminInfo.cs" />
+    <Compile Include="Classes\RadioTransceiver.cs" />
+    <Compile Include="Data Payloads\Server Data\ClientInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TransmitterType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
