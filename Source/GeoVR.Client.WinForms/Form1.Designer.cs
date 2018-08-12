@@ -179,6 +179,7 @@
             this.cbFrequency.Name = "cbFrequency";
             this.cbFrequency.Size = new System.Drawing.Size(212, 21);
             this.cbFrequency.TabIndex = 18;
+            this.cbFrequency.SelectedIndexChanged += new System.EventHandler(this.cbFrequency_SelectedIndexChanged);
             // 
             // Form1
             // 

@@ -199,7 +199,7 @@ namespace GeoVR.Client.WinForms
                     case Shared.ClientType.RadioFixed:
                         foreach (var transceiver in client.Transceivers)
                         {
-                            AddMarker(transceiver.LatDeg, transceiver.LonDeg, client.Callsign);
+                            AddMarker(transceiver.LatDeg, transceiver.LonDeg, client.Callsign + " - " + client.Frequency);
                             AddRadioRing(transceiver.LatDeg, transceiver.LonDeg, transceiver.ReceiveRadiusMeters / 1609.34, Color.Gray, client.Callsign + " receive");
                             AddRadioRing(transceiver.LatDeg, transceiver.LonDeg, transceiver.TransmitRadiusMeters / 1609.34, Color.Gray, client.Callsign + " transmit");
                         }
@@ -254,7 +254,7 @@ namespace GeoVR.Client.WinForms
             clientManager.Frequency(frequency);
         }
 
-        private void tbFrequency_TextChanged(object sender, EventArgs e)
+        private void cbFrequency_SelectedIndexChanged(object sender, EventArgs e)
         {
             var frequency = (string)cbFrequency.SelectedItem;
 

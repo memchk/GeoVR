@@ -28,10 +28,12 @@ namespace GeoVR.Shared
 
         private bool IsClientWithinRange(Client remoteClient)
         {
+            if (Frequency != remoteClient.Frequency)
+                return false;
             switch (Type)
             {
                 case ClientType.VoipRoom:
-                    if (remoteClient.Type == ClientType.VoipRoom & remoteClient.Frequency == Frequency)
+                    if (remoteClient.Type == ClientType.VoipRoom)
                         return true;
                     else
                         return false;
