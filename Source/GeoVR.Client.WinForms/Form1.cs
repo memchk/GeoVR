@@ -150,7 +150,7 @@ namespace GeoVR.Client.WinForms
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.LControlKey)
+            if (e.KeyCode == Keys.ControlKey)
             {
                 PTT(true);
             }
@@ -158,7 +158,7 @@ namespace GeoVR.Client.WinForms
 
         private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.LControlKey)
+            if (e.KeyCode == Keys.ControlKey)
             {
                 PTT(false);
             }
