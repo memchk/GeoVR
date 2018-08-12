@@ -168,9 +168,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(335, 11);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(161, 13);
+            this.label3.Size = new System.Drawing.Size(186, 13);
             this.label3.TabIndex = 15;
-            this.label3.Text = "The PTT button is the spacebar.";
+            this.label3.Text = "The PTT button is the left control key.";
             // 
             // cbFrequency
             // 

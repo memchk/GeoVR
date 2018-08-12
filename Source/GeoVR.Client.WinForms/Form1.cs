@@ -150,7 +150,7 @@ namespace GeoVR.Client.WinForms
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Space)
+            if (e.KeyCode == Keys.LControlKey)
             {
                 PTT(true);
             }
@@ -158,7 +158,7 @@ namespace GeoVR.Client.WinForms
 
         private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Space)
+            if (e.KeyCode == Keys.LControlKey)
             {
                 PTT(false);
             }
@@ -191,7 +191,7 @@ namespace GeoVR.Client.WinForms
                         if (client.Online)
                         {
                             if (client.Callsign != username)
-                                AddMarker(client.Transceivers[0].LatDeg, client.Transceivers[0].LonDeg, client.Callsign);
+                                AddMarker(client.Transceivers[0].LatDeg, client.Transceivers[0].LonDeg, client.Callsign + " - " + client.Frequency);
                             AddRadioRing(client.Transceivers[0].LatDeg, client.Transceivers[0].LonDeg, client.Transceivers[0].ReceiveRadiusMeters / 1609.34, Color.Red, client.Callsign + " receive");
                             AddRadioRing(client.Transceivers[0].LatDeg, client.Transceivers[0].LonDeg, client.Transceivers[0].TransmitRadiusMeters / 1609.34, Color.Blue, client.Callsign + " transmit");
                         }
