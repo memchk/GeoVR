@@ -46,13 +46,13 @@
             this.metroLabel6 = new MetroFramework.Controls.MetroLabel();
             this.metroLabel8 = new MetroFramework.Controls.MetroLabel();
             this.metroLabel9 = new MetroFramework.Controls.MetroLabel();
-            this.metroLabel10 = new MetroFramework.Controls.MetroLabel();
+            this.lblSimConnection = new MetroFramework.Controls.MetroLabel();
             this.lblFrequency = new MetroFramework.Controls.MetroLabel();
             this.SuspendLayout();
             // 
             // tbUsername
             // 
-            this.tbUsername.Location = new System.Drawing.Point(476, 100);
+            this.tbUsername.Location = new System.Drawing.Point(491, 100);
             this.tbUsername.Name = "tbUsername";
             this.tbUsername.Size = new System.Drawing.Size(123, 20);
             this.tbUsername.TabIndex = 4;
@@ -113,7 +113,7 @@
             // 
             // btnConnect
             // 
-            this.btnConnect.Location = new System.Drawing.Point(281, 172);
+            this.btnConnect.Location = new System.Drawing.Point(225, 167);
             this.btnConnect.Name = "btnConnect";
             this.btnConnect.Size = new System.Drawing.Size(212, 23);
             this.btnConnect.TabIndex = 17;
@@ -152,7 +152,7 @@
             // 
             this.RadioLabel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.RadioLabel.AutoSize = true;
-            this.RadioLabel.Location = new System.Drawing.Point(16, 215);
+            this.RadioLabel.Location = new System.Drawing.Point(7, 209);
             this.RadioLabel.Name = "RadioLabel";
             this.RadioLabel.Size = new System.Drawing.Size(46, 19);
             this.RadioLabel.TabIndex = 29;
@@ -164,7 +164,7 @@
             this.lblPTT.AutoSize = true;
             this.lblPTT.CustomForeColor = true;
             this.lblPTT.ForeColor = System.Drawing.Color.DimGray;
-            this.lblPTT.Location = new System.Drawing.Point(68, 215);
+            this.lblPTT.Location = new System.Drawing.Point(59, 209);
             this.lblPTT.Name = "lblPTT";
             this.lblPTT.Size = new System.Drawing.Size(36, 19);
             this.lblPTT.Style = MetroFramework.MetroColorStyle.Blue;
@@ -175,7 +175,7 @@
             // 
             this.metroLabel5.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.metroLabel5.AutoSize = true;
-            this.metroLabel5.Location = new System.Drawing.Point(177, 215);
+            this.metroLabel5.Location = new System.Drawing.Point(141, 209);
             this.metroLabel5.Name = "metroLabel5";
             this.metroLabel5.Size = new System.Drawing.Size(95, 19);
             this.metroLabel5.TabIndex = 31;
@@ -185,7 +185,7 @@
             // 
             this.metroLabel7.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.metroLabel7.AutoSize = true;
-            this.metroLabel7.Location = new System.Drawing.Point(413, 215);
+            this.metroLabel7.Location = new System.Drawing.Point(338, 209);
             this.metroLabel7.Name = "metroLabel7";
             this.metroLabel7.Size = new System.Drawing.Size(80, 19);
             this.metroLabel7.TabIndex = 32;
@@ -197,7 +197,7 @@
             this.lblReceivedAudioBytes.AutoSize = true;
             this.lblReceivedAudioBytes.CustomForeColor = true;
             this.lblReceivedAudioBytes.ForeColor = System.Drawing.Color.DimGray;
-            this.lblReceivedAudioBytes.Location = new System.Drawing.Point(278, 215);
+            this.lblReceivedAudioBytes.Location = new System.Drawing.Point(242, 209);
             this.lblReceivedAudioBytes.Name = "lblReceivedAudioBytes";
             this.lblReceivedAudioBytes.Size = new System.Drawing.Size(36, 19);
             this.lblReceivedAudioBytes.Style = MetroFramework.MetroColorStyle.Blue;
@@ -210,7 +210,7 @@
             this.lblLastSender.AutoSize = true;
             this.lblLastSender.CustomForeColor = true;
             this.lblLastSender.ForeColor = System.Drawing.Color.DimGray;
-            this.lblLastSender.Location = new System.Drawing.Point(499, 215);
+            this.lblLastSender.Location = new System.Drawing.Point(420, 209);
             this.lblLastSender.Name = "lblLastSender";
             this.lblLastSender.Size = new System.Drawing.Size(36, 19);
             this.lblLastSender.Style = MetroFramework.MetroColorStyle.Blue;
@@ -220,16 +220,16 @@
             // metroLabel6
             // 
             this.metroLabel6.AutoSize = true;
-            this.metroLabel6.Location = new System.Drawing.Point(429, 100);
+            this.metroLabel6.Location = new System.Drawing.Point(429, 98);
             this.metroLabel6.Name = "metroLabel6";
-            this.metroLabel6.Size = new System.Drawing.Size(30, 19);
+            this.metroLabel6.Size = new System.Drawing.Size(57, 19);
             this.metroLabel6.TabIndex = 35;
-            this.metroLabel6.Text = "CID";
+            this.metroLabel6.Text = "Callsign:";
             // 
             // metroLabel8
             // 
             this.metroLabel8.AutoSize = true;
-            this.metroLabel8.Location = new System.Drawing.Point(398, 130);
+            this.metroLabel8.Location = new System.Drawing.Point(413, 130);
             this.metroLabel8.Name = "metroLabel8";
             this.metroLabel8.Size = new System.Drawing.Size(72, 19);
             this.metroLabel8.TabIndex = 36;
@@ -239,30 +239,30 @@
             // 
             this.metroLabel9.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.metroLabel9.AutoSize = true;
-            this.metroLabel9.Location = new System.Drawing.Point(608, 215);
+            this.metroLabel9.Location = new System.Drawing.Point(524, 209);
             this.metroLabel9.Name = "metroLabel9";
-            this.metroLabel9.Size = new System.Drawing.Size(39, 19);
+            this.metroLabel9.Size = new System.Drawing.Size(34, 19);
             this.metroLabel9.TabIndex = 37;
-            this.metroLabel9.Text = "Data:";
+            this.metroLabel9.Text = "Sim:";
             // 
-            // metroLabel10
+            // lblSimConnection
             // 
-            this.metroLabel10.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.metroLabel10.AutoSize = true;
-            this.metroLabel10.CustomForeColor = true;
-            this.metroLabel10.ForeColor = System.Drawing.Color.DimGray;
-            this.metroLabel10.Location = new System.Drawing.Point(652, 215);
-            this.metroLabel10.Name = "metroLabel10";
-            this.metroLabel10.Size = new System.Drawing.Size(98, 19);
-            this.metroLabel10.Style = MetroFramework.MetroColorStyle.Blue;
-            this.metroLabel10.TabIndex = 38;
-            this.metroLabel10.Text = "Not Connected";
+            this.lblSimConnection.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.lblSimConnection.AutoSize = true;
+            this.lblSimConnection.CustomForeColor = true;
+            this.lblSimConnection.ForeColor = System.Drawing.Color.DimGray;
+            this.lblSimConnection.Location = new System.Drawing.Point(564, 209);
+            this.lblSimConnection.Name = "lblSimConnection";
+            this.lblSimConnection.Size = new System.Drawing.Size(98, 19);
+            this.lblSimConnection.Style = MetroFramework.MetroColorStyle.Blue;
+            this.lblSimConnection.TabIndex = 38;
+            this.lblSimConnection.Text = "Not Connected";
             // 
             // lblFrequency
             // 
             this.lblFrequency.AutoSize = true;
             this.lblFrequency.ForeColor = System.Drawing.Color.DimGray;
-            this.lblFrequency.Location = new System.Drawing.Point(476, 130);
+            this.lblFrequency.Location = new System.Drawing.Point(491, 130);
             this.lblFrequency.Name = "lblFrequency";
             this.lblFrequency.Size = new System.Drawing.Size(50, 19);
             this.lblFrequency.TabIndex = 39;
@@ -272,9 +272,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(834, 240);
+            this.ClientSize = new System.Drawing.Size(672, 236);
             this.Controls.Add(this.lblFrequency);
-            this.Controls.Add(this.metroLabel10);
+            this.Controls.Add(this.lblSimConnection);
             this.Controls.Add(this.metroLabel9);
             this.Controls.Add(this.metroLabel8);
             this.Controls.Add(this.metroLabel6);
@@ -295,7 +295,7 @@
             this.Controls.Add(this.tbUsername);
             this.Name = "Form1";
             this.Resizable = false;
-            this.Text = "A.F.V Test Client";
+            this.Text = "Audio For VATSIM Client V0.1";
             this.Deactivate += new System.EventHandler(this.Form1_Deactivate);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
@@ -322,7 +322,7 @@
         private MetroFramework.Controls.MetroLabel metroLabel6;
         private MetroFramework.Controls.MetroLabel metroLabel8;
         private MetroFramework.Controls.MetroLabel metroLabel9;
-        private MetroFramework.Controls.MetroLabel metroLabel10;
+        private MetroFramework.Controls.MetroLabel lblSimConnection;
         private MetroFramework.Controls.MetroLabel lblFrequency;
     }
 }

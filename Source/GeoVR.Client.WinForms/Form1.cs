@@ -298,14 +298,15 @@ namespace GeoVR.Client.WinForms
 
         private void cbFrequency_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var frequency = (string)cbFrequency.SelectedItem;
+            var frequency = (string)cbFrequency.Text;
 
+            /*
             if (string.IsNullOrWhiteSpace(frequency))
             {
                 MessageBox.Show("Frequency invalid.");
                 return;
             }
-
+            */
             clientManager.Frequency(frequency);
         }
     }

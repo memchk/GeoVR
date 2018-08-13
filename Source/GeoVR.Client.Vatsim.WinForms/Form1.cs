@@ -25,6 +25,7 @@ namespace GeoVR.Client.VATSIM.WinForms
         double lonDeg = 0;
         string username = "";
         private GlobalKeyboardHook _globalKeyboardHook;
+        MapConnector connector;
 
         public Form1()
         {
@@ -110,10 +111,68 @@ namespace GeoVR.Client.VATSIM.WinForms
         private void Form1_Load(object sender, EventArgs e)
         {
             InitMap();
-        
+            connector = new MapConnector("AFV");
+            connector.Connect();
+
+            connector.OnPositionReceived += Connector_OnPositionReceived;
         }
 
-      
+        private void Connector_OnPositionReceived(object sender, GenericEventArgs<MapConnector.ReadUserPosStruct> e)
+        {
+            string ComFreq = "1" + IntToBCD(e.Value.ComFreq, true).Substring(0, 2) + "." + IntToBCD(e.Value.ComFreq, true).Substring(2, 2);
+
+            if ((ComFreq.Substring(ComFreq.Length-1,1)=="2") || (ComFreq.Substring(ComFreq.Length - 1, 1) == "7"))
+            {
+                ComFreq = ComFreq + "5";
+            }
+            else
+            {
+                ComFreq = ComFreq + "0";
+            }
+
+            Invoke((MethodInvoker)delegate {
+                lblFrequency.Text = ComFreq;
+                lblSimConnection.Text = "Connected";
+            });
+
+
+            latDeg = e.Value.Latitude * 180.0/Math.PI;
+            lonDeg = e.Value.Longitude * 180.0 / Math.PI;
+            clientManager.Position(latDeg, lonDeg,e.Value.HeightAboveGround*0.3048f);
+            clientManager.Frequency(ComFreq);
+
+
+        }
+
+        static string IntToBCD(int input, bool isInput)
+        {
+            if (input > 9999 || input < 0)
+                throw new ArgumentOutOfRangeException("input");
+
+            int thousands = input / 1000;
+            int hundreds = (input -= thousands * 1000) / 100;
+            int tens = (input -= hundreds * 100) / 10;
+            int ones = (input -= tens * 10);
+
+            byte[] bcdbyte = new byte[] {
+        (byte)(thousands << 4 | hundreds),
+        (byte)(tens << 4 | ones)
+    };
+            string bcd = string.Empty;
+            foreach (byte b in bcdbyte)
+                bcd += string.Format("{0:X2}", b);
+
+            if (isInput)
+            {
+                int bVal = int.Parse(bcd);
+
+                bcd = bVal.ToString("X");
+            }
+
+
+            return bcd;
+        }
+
         private void AddRadioRing(double lat, double lon, double range, Color color, string name)
         {
             range = range * 2;
@@ -182,9 +241,9 @@ namespace GeoVR.Client.VATSIM.WinForms
 
         private void gMapControl1_OnPositionChanged(PointLatLng point)
         {
-            latDeg = point.Lat;
-            lonDeg = point.Lng;
-            clientManager.Position(latDeg, lonDeg, 9144);
+           // latDeg = point.Lat;
+           // lonDeg = point.Lng;
+        //clientManager.Position(latDeg, lonDeg, 9144);
             //RefreshMapMarkers();
         }
 

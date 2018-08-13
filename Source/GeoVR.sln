@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoVR.Server.ConsoleApp", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoVR.Client.Vatsim.WinForms", "GeoVR.Client.Vatsim.WinForms\GeoVR.Client.Vatsim.WinForms.csproj", "{C1D85EEF-B0D2-485E-ACA6-60CBC5D5515B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoVR.Client.WinForms", "GeoVR.Client.WinForms\GeoVR.Client.WinForms.csproj", "{A6542ED8-27BD-43FA-BAD2-45A71EB6BBAF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{C1D85EEF-B0D2-485E-ACA6-60CBC5D5515B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1D85EEF-B0D2-485E-ACA6-60CBC5D5515B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1D85EEF-B0D2-485E-ACA6-60CBC5D5515B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6542ED8-27BD-43FA-BAD2-45A71EB6BBAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6542ED8-27BD-43FA-BAD2-45A71EB6BBAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6542ED8-27BD-43FA-BAD2-45A71EB6BBAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6542ED8-27BD-43FA-BAD2-45A71EB6BBAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

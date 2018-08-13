@@ -60,7 +60,9 @@
     <Compile Include="ServerStatistics.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GeoVR.Shared\GeoVR.Shared.csproj">

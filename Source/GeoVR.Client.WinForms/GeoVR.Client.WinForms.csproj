@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C1D85EEF-B0D2-485E-ACA6-60CBC5D5515B}</ProjectGuid>
+    <ProjectGuid>{A6542ED8-27BD-43FA-BAD2-45A71EB6BBAF}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>GeoVR.Client.WinForms</RootNamespace>
     <AssemblyName>GeoVR.Client.WinForms</AssemblyName>
