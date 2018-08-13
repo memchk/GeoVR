@@ -65,7 +65,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GeoVR.Shared\GeoVR.Shared.csproj">
       <Project>{d645095a-817a-45b1-8c26-2ebea70a2cbe}</Project>
-      <Name>VATSIM.Shared</Name>
+      <Name>GeoVR.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

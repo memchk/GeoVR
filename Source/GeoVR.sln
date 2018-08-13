@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoVR.Client.WPF", "GeoVR.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoVR.Server.ConsoleApp", "GeoVR.Server.ConsoleApp\GeoVR.Server.ConsoleApp.csproj", "{4DEF5F46-16E1-4D14-B62C-5B46F3D01BED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoVR.Client.WinForms", "GeoVR.Client.WinForms\GeoVR.Client.WinForms.csproj", "{C1D85EEF-B0D2-485E-ACA6-60CBC5D5515B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoVR.Client.Vatsim.WinForms", "GeoVR.Client.Vatsim.WinForms\GeoVR.Client.Vatsim.WinForms.csproj", "{C1D85EEF-B0D2-485E-ACA6-60CBC5D5515B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
