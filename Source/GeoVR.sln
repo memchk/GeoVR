@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoVR.Client.WPF", "GeoVR.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoVR.Server.ConsoleApp", "GeoVR.Server.ConsoleApp\GeoVR.Server.ConsoleApp.csproj", "{4DEF5F46-16E1-4D14-B62C-5B46F3D01BED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoVR.Client.Vatsim.WinForms", "GeoVR.Client.Vatsim.WinForms\GeoVR.Client.Vatsim.WinForms.csproj", "{C1D85EEF-B0D2-485E-ACA6-60CBC5D5515B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoVR.Client.WinForms", "GeoVR.Client.WinForms\GeoVR.Client.WinForms.csproj", "{A6542ED8-27BD-43FA-BAD2-45A71EB6BBAF}"
 EndProject
 Global
@@ -49,10 +47,6 @@ Global
 		{4DEF5F46-16E1-4D14-B62C-5B46F3D01BED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DEF5F46-16E1-4D14-B62C-5B46F3D01BED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DEF5F46-16E1-4D14-B62C-5B46F3D01BED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C1D85EEF-B0D2-485E-ACA6-60CBC5D5515B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C1D85EEF-B0D2-485E-ACA6-60CBC5D5515B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C1D85EEF-B0D2-485E-ACA6-60CBC5D5515B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C1D85EEF-B0D2-485E-ACA6-60CBC5D5515B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A6542ED8-27BD-43FA-BAD2-45A71EB6BBAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A6542ED8-27BD-43FA-BAD2-45A71EB6BBAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6542ED8-27BD-43FA-BAD2-45A71EB6BBAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
